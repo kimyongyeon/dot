@@ -1,6 +1,6 @@
 var isSeoulShow = "seoul";
 
-function getGeoMapMaker() {
+function drawGeoMainMapChart() {
 
     var idxDataArr = [];
     var mainPath = "/resources/geo/";
@@ -75,7 +75,7 @@ function getGeoMapMaker() {
         cityCd["서울특별시"] = "11";
         var myChart = echarts.init(document.getElementById('koreaMap'));
         myChart.setTheme(GV_CHART_THEME);
-        getSubResultChart(param, cityArrayTemp, "", myChart, cityCd);
+        drawGeoSubMapChart(param, cityArrayTemp, "", myChart, cityCd);
         return;
     }
 
@@ -105,9 +105,9 @@ function getGeoMapMaker() {
     });
     var dataCount = dataArr.length;
 
- // Initialize after dom ready
+    // Initialize after dom ready
     var myChart = echarts.init(document.getElementById('koreaMap'));
-    
+
     myChart.setTheme(GV_CHART_THEME);
 
     echarts.util.mapData.params.params.korea = {
@@ -159,7 +159,7 @@ function getGeoMapMaker() {
 
     // 시도 클릭시
     myChart.on(ecConfig.EVENT.MAP_SELECTED, function (param) {
-        getSubResultChart(param, cityArray, option, myChart, idxDataArr);
+        drawGeoSubMapChart(param, cityArray, option, myChart, idxDataArr);
     });
 
     // Load data into the ECharts instance
@@ -168,7 +168,7 @@ function getGeoMapMaker() {
 
 }
 
-function getSubResultChart(param, cityArray, option, myChart, idxDataArr) {
+function drawGeoSubMapChart(param, cityArray, option, myChart, idxDataArr) {
 
     var subDataArr = [];
     var ecConfig = echarts.config;
@@ -226,7 +226,7 @@ function getSubResultChart(param, cityArray, option, myChart, idxDataArr) {
                 $.getJSON(cityPath, callback);
             }
         }
-        
+
         option = {
 
             series: [{
@@ -280,7 +280,7 @@ function getSubResultChart(param, cityArray, option, myChart, idxDataArr) {
             });
 
             if (isSelected) {
-                getSubResultChart(param, cityArray, option, myChart, idxDataArr);
+                drawGeoSubMapChart(param, cityArray, option, myChart, idxDataArr);
             } else {
                 callAjaxMainActivityArea(cityName, cityCd, "getCallBack");
             }

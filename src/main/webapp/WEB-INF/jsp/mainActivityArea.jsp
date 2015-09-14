@@ -112,7 +112,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                             <p class="tit">함께 방문하는 지역</p>
 
                             <p class="btnSp">
-                                <button class="button" type="button" data-toggle="modal" id="chart6_popup"
+                                <button class="button" type="button" data-toggle="modal" id="btnLargeScaleView"
                                         data-target="#myModal2">확대보기
                                 </button>
                             </p>
@@ -285,8 +285,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
 
         <!-- Modal 함께 방문하는 지역 네트웍차트 -->
-        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-             aria-hidden="true">
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog ">
 
                 <div class="modal-content" style="width:100% !important;">
@@ -414,13 +413,29 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                     NODE_COLOR: "",
                     NODE_BORDER_COLOR: "",
                     LINE_COLOR: "",
-                    isBtnSearch : false
+                    isBtnSearch : false,
+                    MIN: "min",
+                    MAX: "max"
                 };
             })();
 
+            $(document).ready(function () {
+
+                setChartResize();
+
+                setSelectboxValue({mainCnt:Network.mainAdmDongCdCnt,crossCnt:Network.crossAdmDongCdCnt});
+
+                drawGeoMainMapChart(); // 지도 호출
+
+            });
+
+            $("#clickKoreaMap").click(function () {
+                callAjaxMainActivityArea("korea", "", "getCallBack");
+            });
+
             function setChartResize() {
 
-                var chartWidth = (($(document).width() - 50) / 100 * 98 / 3) - 40;    // screen.availWidth
+                var chartWidth = ( ($(document).width() - 50) / 100 * 98 / 3 ) - 40;    // screen.availWidth
 
                 $('#chartDong1').width(chartWidth);
                 $('#chartDong2').width(chartWidth);
@@ -444,39 +459,28 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             }
 
-            function setSelectbox() {
-
-                $("#mainAdmDongCdCnt").selectBox("value", "10");
-                $("#crossAdmDongCdCnt").selectBox("value", "5");
-
+            function setSelectboxValue(o) {
+                $("#mainAdmDongCdCnt").selectBox("value", o.mainCnt);
+                $("#crossAdmDongCdCnt").selectBox("value", o.crossCnt);
             }
 
-            $(document).ready(function () {
-
-                setChartResize();
-
-                setSelectbox();
-
-                getGeoMapMaker(); // 지도 호출
-
-                $("#clickKoreaMap").click(function () {
-                    callAjaxMainActivityArea("korea", "", "getCallBack");
-                });
-            });
-
-            $('#chart6_popup').click(function () {
+            $('#btnLargeScaleView').click(function () {
 
                 Network.mainAdmDongCdCnt = 10;
                 Network.crossAdmDongCdCnt = 5;
+
                 var cityCd = City.cd;
+
                 if (City.cd.length > 6) {
                     cityCd = City.cd.substring(0, 6);
                 }
+
                 callAjaxMainActivityArea(City.name, cityCd, getNetworkChartPopup);
 
             });
 
             function setLinkColor(option) {
+
                 $.each(Network.option.series[0].links, function (idx, data) {
                     if (data.itemStyle.normal.width === option.width) {
                         data.itemStyle.normal.color = '#f8f8f8';
@@ -484,46 +488,39 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                         data.itemStyle.normal.color = Network.LINE_COLOR;
                     }
                 });
+
             }
 
             $('#thineLine').click(function () {
 
                 setLinkColor({width:1});
 
-                setmyChartRefresh();
-
-                getNetworkChartClickEvent(myChart);
+                setNetworkChartRefreshOpt();
 
             });
 
             $('#thickLine').click(function () {
 
-
                 setLinkColor({width:0.2});
 
-                setmyChartRefresh();
-
-                getNetworkChartClickEvent(myChart);
+                setNetworkChartRefreshOpt();
 
             });
 
             $('#thinethickLine').click(function () {
 
-
                 setLinkColor({width:0});
 
-                setmyChartRefresh();
-
-                getNetworkChartClickEvent(myChart);
+                setNetworkChartRefreshOpt();
 
             });
 
-            function setNetworkOpt(option) {
+            function setNetworkChartScalingAndGravityOpt(option) {
 
                 var scaling = 0.3;
                 var gravity = 1;
 
-                if( option.gubun === "min" ) {
+                if( option.gubun === Network.MIN ) {
 
                     Network.option.series[0].scaling = Number(Network.option.series[0].scaling) - scaling;
                     Network.option.series[0].gravity = Number(Network.option.series[0].gravity) - gravity;
@@ -549,7 +546,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
                 var height = 0;
 
-                if (opt.gubun === "min") {
+                if (opt.gubun === Network.MIN) {
 
                     height = $('#' + Network.MAX_CHART_ID_NM).height();
                     height = height - 100;
@@ -558,7 +555,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                         height = 650;
                     }
 
-                } else if (opt.gubun === "max") {
+                } else if (opt.gubun === Network.MAX) {
 
                     height = $('#' + Network.MAX_CHART_ID_NM).height();
                     height = height + 100;
@@ -569,12 +566,13 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
                 }
 
-                $('#modalChartLy').height(height); //  차트 박스 테두리
+                $('#modalChartLy').height(height); //  차트박스 테두리 박스 높이
+
                 $('#' + Network.MAX_CHART_ID_NM).height(height);
 
             }
 
-            function setCanvasAttr() {
+            function setNetworkChartCanvasAttr() {
 
                 var canvas = $('canvas');
                 canvas.attr('z-index', 100);
@@ -583,40 +581,40 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             }
 
-            function setmyChartRefresh() {
+            function setNetworkChartRefreshOpt() {
 
                 var myChart = echarts.init(document.getElementById(Network.MAX_CHART_ID_NM));
+
                 myChart.setOption(Network.option);
+
                 myChart.refresh();
+
+                getNetworkChartClickEvent(myChart);
 
             }
 
             $('#minButton').click(function () {
 
-                setNetworkOpt({gubun:"min"});
+                setNetworkChartScalingAndGravityOpt({gubun:Network.MIN});
 
-                setmyChartRefresh();
+                setNetworkChartRefreshOpt();
 
-                setNetworkChartHeightResize({gubun:"min"});
+                setNetworkChartHeightResize({gubun:Network.MIN});
 
-                setCanvasAttr();
-
-                getNetworkChartClickEvent(myChart);
+                setNetworkChartCanvasAttr();
 
             });
 
 
             $('#maxButton').click(function () {
 
-                setNetworkOpt({gubun:"max"});
+                setNetworkChartScalingAndGravityOpt({gubun:Network.MAX});
 
-                setmyChartRefresh();
+                setNetworkChartRefreshOpt();
 
-                setNetworkChartHeightResize({gubun:"max"});
+                setNetworkChartHeightResize({gubun:Network.MAX});
 
-                setCanvasAttr();
-
-                getNetworkChartClickEvent(myChart);
+                setNetworkChartCanvasAttr();
 
             });
 
@@ -627,9 +625,33 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
                 Network.isBtnSearch = true;
 
-                callAjaxMainActivityArea(City.name, City.cd, "getCallbackChart6");
+                callAjaxMainActivityArea(City.name, City.cd, function(data) {
+
+                    var dataNodeList = data.arPocNetworkNodeList;
+                    var dataLinkList = data.arPocNetworkLinkList;
+
+                    var myChart = echarts.init(document.getElementById(Network.MAX_CHART_ID_NM));
+
+                    myChart.setTheme(GV_CHART_THEME);
+
+                    myChart.setOption(_getNetworkChartOption(dataNodeList, dataLinkList));
+
+                    getNetworkChartClickEvent(myChart);
+
+                    resizeChartOnWinResizeHandler.on(myChart);
+                });
 
             });
+
+            function setNetworkChartItemColorOpt() {
+
+                Network.NODE_COLOR = '#49cdf4';
+
+                Network.NODE_BORDER_COLOR = '#2c9ae9';
+
+                Network.LINE_COLOR = '#2353a3';
+
+            }
 
             function _getNetworkChartOption(dataNodeList, dataLinkList) {
 
@@ -637,14 +659,10 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 var linkList = [];
                 var categoriesList = [];
                 var categoryIdx = 0;
-                // category[0] : 시,구,동
-                // category[1] : 상위지역
                 var cityName = $("#chart2ParentTitle").text();
                 var subCityName = $("#chart2SubTitle").text();
 
-                Network.NODE_COLOR = '#49cdf4';
-                Network.NODE_BORDER_COLOR = '#2c9ae9';
-                Network.LINE_COLOR = '#2353a3';
+                setNetworkChartItemColorOpt();
 
                 if (City.cd.length === 8) {
                     var dongName = $('#dongNm').text().split(' ')[2];
@@ -806,8 +824,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
                 setNetworkChartHeightResize({gubun:"650"});
 
-                $("#mainAdmDongCdCnt").selectBox("value", "10");
-                $("#crossAdmDongCdCnt").selectBox("value", "5");
+                setSelectboxValue({mainCnt:Network.mainAdmDongCdCnt,crossCnt:Network.crossAdmDongCdCnt});
 
                 getNetworkChart("chart6", data.arPocNetworkNodeList, data.arPocNetworkLinkList); // 확대/축소 팝업 네트워크 차트
 
@@ -864,6 +881,20 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 });
             }
 
+            function setCallBack(callbackFun, data, cityName, cityCd) {
+
+                if (existy(callbackFun)) {
+
+                    if ($.isFunction(callbackFun)) {
+                        callbackFun(data, cityName, cityCd);
+                    } else if (typeof(callbackFun) == "string") {
+                        eval(callbackFun + "(data, cityName, cityCd);");
+                    }
+
+                }
+
+            }
+
             function callAjaxMainActivityArea(cityName, cityCd, callbackFun) {
 
                 City.name = cityName;
@@ -908,19 +939,12 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                             City.data = data;
 
                             // callback
-                            if (callbackFun != null && callbackFun != 'undefined' && callbackFun != '') {
-
-                                if ($.isFunction(callbackFun)) {
-                                    console.time("nocache");
-                                    callbackFun(data, cityName, cityCd);
-                                    console.timeEnd("nocache");
-                                } else if (typeof(callbackFun) == "string") {
-                                    eval(callbackFun + "(data, cityName, cityCd);");
-                                }
-                            }
+                            setCallBack(callbackFun, data, cityName, cityCd);
 
                             return false;
+
                         }
+
                         return true;
                     },
                     complete: function (jqXHR, textStatus) {
@@ -929,26 +953,16 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                     success: function (data) {
 
                         City.data = data;
-
                         // callback
-                        if (callbackFun != null && callbackFun != 'undefined' && callbackFun != '') {
+                        //if (callbackFun != null && callbackFun != 'undefined' && callbackFun != '') {
+                        setCallBack(callbackFun, data, cityName, cityCd);
 
-                            if ($.isFunction(callbackFun)) {
-                                callbackFun(data, cityName, cityCd);
-                            } else if (typeof(callbackFun) == "string") {
-                                eval(callbackFun + "(data, cityName, cityCd);");
-                            }
-                        }
                     }
                 });
             }
 
             var chartDataList = [];
             var GV_CITY_CD, GV_CITY_NM, GV_PARENT_CITY_NM;
-
-            function getCallbackChart6(data, cityName, cityCd) {
-                getNetworkChart("chart6", data.arPocNetworkNodeList, data.arPocNetworkLinkList);
-            }
 
             function getCallBack(data, cityName, cityCd) {
 
@@ -964,23 +978,23 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 chartDataList = data.mosuTableList;
 
                 if (cityCd == "" || cityCd == "00") {
+
                     $('#divSubData').hide();
+
                 } else {
+
                     $('#divSubData').show();
                     getSexAgePieChart('chart1', 'chart2', data.sexBarList, data.ageBarList);
                     getSexAgeBarChart('chart3', data.sexAgeBarList);
                     getRankTable(data.rankTableList);
-
-
                     getNetworkChart("chart4", data.arPocNetworkNodeList, data.arPocNetworkLinkList);
 
                 }
 
                 if (cityName == "korea") {
-                    getGeoMapMaker(); // 지도 호출
+                    drawGeoMainMapChart(); // 지도 호출
                 }
 
-//                console.log("Page load took getCallBack " + (Date.now() - start)  + " milliseconds");
             }
 
             // 지역별 모수 현황
