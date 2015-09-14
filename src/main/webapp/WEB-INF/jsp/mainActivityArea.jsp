@@ -34,7 +34,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                             <div class="round_chartArea">
                                 <!--Button Korea Map-->
                                 <p class="koreaBtn ">
-                                    <button type="button" id="clickKoreaMap">Korea Map</button>
+                                    <button type="button" id="btnKoreaMap">Korea Map</button>
                                 </p>
                                 <p>
 
@@ -113,12 +113,12 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
                             <p class="btnSp">
                                 <button class="button" type="button" data-toggle="modal" id="btnLargeScaleView"
-                                        data-target="#myModal2">확대보기
+                                        data-target="#networkLargeScaleChartModal">확대보기
                                 </button>
                             </p>
 
                             <div class="inBox2">
-                                <div id="chart4" style="width:100%; height: 480px;"></div>
+                                <div id="chartNetworkMain" style="width:100%; height: 480px;"></div>
                             </div>
                         </div>
                         <!--//함께 방문하는 지역 -->
@@ -188,7 +188,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
 
         <!--Modal 동단위 현황지역 -->
-        <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        <div class="modal fade" id="networkDongChartModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true" id="chartDongDiv">
             <div class="modal-dialog3 ">
                 <div class="modal-content">
@@ -270,7 +270,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                                 <p class="tit">함께 방문하는 지역</p>
 
                                 <div class="inBox">
-                                    <div id="chart5" style="height:370px;"></div>
+                                    <div id="chartNetworkDong" style="height:370px;"></div>
                                     <!-- width:760px !important;  -->
                                 </div>
                             </div>
@@ -285,7 +285,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
 
         <!-- Modal 함께 방문하는 지역 네트웍차트 -->
-        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal fade" id="networkLargeScaleChartModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog ">
 
                 <div class="modal-content" style="width:100% !important;">
@@ -341,17 +341,17 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                         <div class="layoutLR modalChartLy" style="overflow-y: auto;">
 
                             <div class="floatL" style="width:80%">
-                                <div id="chart6" style="width:100%;"></div>
+                                <div id="chartNetworkLargeScale" style="width:100%;"></div>
                             </div>
 
                             <div class="floatR" style="width:19%">
                                 <div class="chartIcon">
-                                    <button class="plus" id="maxButton"><i class="fa fa-plus"></i></button>
-                                    <button class="minus" id="minButton"><i class="fa fa-minus"></i></button>
+                                    <button class="plus" id="btnMaxScale"><i class="fa fa-plus"></i></button>
+                                    <button class="minus" id="btnMinScale"><i class="fa fa-minus"></i></button>
                                     <p class="line">
-                                        <button class="line1" id="thinethickLine"><i class="fa fa-plus"></i></button>
-                                        <button class="line2" id="thineLine"><i class="fa fa-plus"></i></button>
-                                        <button class="line3" id="thickLine"><i class="fa fa-plus"></i></button>
+                                        <button class="line1" id="btnThinethickLine"><i class="fa fa-plus"></i></button>
+                                        <button class="line2" id="btnThineLine"><i class="fa fa-plus"></i></button>
+                                        <button class="line3" id="btnThickLine"><i class="fa fa-plus"></i></button>
                                     </p>
                                 </div>
                             </div>
@@ -407,9 +407,9 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                     crossAdmDongCdCnt: 10,
                     height: 0,
                     width: 0,
-                    MAIN_CHART_ID_NM: "chart4", // 메인 차트
-                    DONG_CHART_ID_NM: "chart5", // 동 차트
-                    MAX_CHART_ID_NM: "chart6", // 확대 /축소 차트
+                    MAIN_CHART_ID_NM: "chartNetworkMain", // 메인 차트
+                    DONG_CHART_ID_NM: "chartNetworkDong", // 동 차트
+                    MAX_CHART_ID_NM: "chartNetworkLargeScale", // 확대 /축소 차트
                     NODE_COLOR: "",
                     NODE_BORDER_COLOR: "",
                     LINE_COLOR: "",
@@ -429,7 +429,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             });
 
-            $("#clickKoreaMap").click(function () {
+            $("#btnKoreaMap").click(function () {
                 callAjaxMainActivityArea("korea", "", "getCallBack");
             });
 
@@ -441,21 +441,18 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 $('#chartDong2').width(chartWidth);
                 $('#chartDong3').width(chartWidth);
 
-                // 확대/축소 팝업 네트워크 차트 넓이 디스플레이 화면에 따라서 다르게 보여주기 위해
                 if($(document).width() > 1000) {
-                    $('#chart6').width(1400);
+                    $('#chartNetworkLargeScale').width(1400);
                 } else {
-                    $('#chart6').width(500);
+                    $('#chartNetworkLargeScale').width(500);
                 }
 
                 var contHeight = screen.availHeight - 140;
                 if (contHeight > 880) contHeight = 880;
-                // 행 팝업 높이 조절
-                $('#myModal3' + ' .modal-content').height(contHeight + 'px');
-                $('#myModal3' + ' .modal_body3').height((contHeight - 110) + 'px');
-                // 네트워크 팝업 높이 조절
-                $('#myModal2' + ' .modal-content').height(contHeight + 'px');
-                $('#myModal2' + ' .modal-body2').height((contHeight - 110) + 'px');
+                $('#networkDongChartModal' + ' .modal-content').height(contHeight + 'px');
+                $('#networkDongChartModal' + ' .modal_body3').height((contHeight - 110) + 'px');
+                $('#networkLargeScaleChartModal' + ' .modal-content').height(contHeight + 'px');
+                $('#networkLargeScaleChartModal' + ' .modal-body2').height((contHeight - 110) + 'px');
 
             }
 
@@ -491,7 +488,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             }
 
-            $('#thineLine').click(function () {
+            $('#btnThineLine').click(function () {
 
                 setLinkColor({width:1});
 
@@ -499,7 +496,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             });
 
-            $('#thickLine').click(function () {
+            $('#btnThickLine').click(function () {
 
                 setLinkColor({width:0.2});
 
@@ -507,7 +504,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             });
 
-            $('#thinethickLine').click(function () {
+            $('#btnThinethickLine').click(function () {
 
                 setLinkColor({width:0});
 
@@ -593,7 +590,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
             }
 
-            $('#minButton').click(function () {
+            $('#btnMinScale').click(function () {
 
                 setNetworkChartScalingAndGravityOpt({gubun:Network.MIN});
 
@@ -606,7 +603,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
             });
 
 
-            $('#maxButton').click(function () {
+            $('#btnMaxScale').click(function () {
 
                 setNetworkChartScalingAndGravityOpt({gubun:Network.MAX});
 
@@ -624,6 +621,10 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 Network.crossAdmDongCdCnt = $('#crossAdmDongCdCnt option:selected').val(); // cross 행정동 갯수
 
                 Network.isBtnSearch = true;
+
+                if ( City.cd.length === 8 ) {
+                    City.cd = City.cd.substring(0,6); 
+                }
 
                 callAjaxMainActivityArea(City.name, City.cd, function(data) {
 
@@ -659,8 +660,6 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 var linkList = [];
                 var categoriesList = [];
                 var categoryIdx = 0;
-                var cityName = $("#chart2ParentTitle").text();
-                var subCityName = $("#chart2SubTitle").text();
 
                 setNetworkChartItemColorOpt();
 
@@ -769,7 +768,6 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                             maxRadius: 30, // 노드 최대 크기
                             gravity: 3.0,
                             scaling: 2.5,
-//                                large: true,
                             roam: 'move', // scale, move
                             nodes: nodeList,
                             links: linkList
@@ -826,7 +824,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
 
                 setSelectboxValue({mainCnt:Network.mainAdmDongCdCnt,crossCnt:Network.crossAdmDongCdCnt});
 
-                getNetworkChart("chart6", data.arPocNetworkNodeList, data.arPocNetworkLinkList); // 확대/축소 팝업 네트워크 차트
+                getNetworkChart("chartNetworkLargeScale", data.arPocNetworkNodeList, data.arPocNetworkLinkList);
 
             }
 
@@ -877,7 +875,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                     GV_CITY_NM = cityName;
                     getSexAgePieChart('chartDong2', 'chartDong3', data.sexBarList, data.ageBarList);
                     getSexAgeBarChart('chartDong1', data.sexAgeBarList);
-                    getNetworkChart("chart5", data.arPocNetworkNodeList, data.arPocNetworkLinkList); // 동 팝업 네트워크 차트
+                    getNetworkChart("chartNetworkDong", data.arPocNetworkNodeList, data.arPocNetworkLinkList); // 동 팝업 네트워크 차트
                 });
             }
 
@@ -900,10 +898,10 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 City.name = cityName;
                 City.cd = cityCd;
 
-                if ((cityName != null && cityName != '') && (cityCd == null || cityCd == 'undefined' || cityCd == '')) {
-                    if (chartDataList != null && chartDataList.length != 0) {
+                if( existy(cityName) && existy(cityCd) ) {
+                    if(existy(chartDataList)) {
                         var selectedData = chartDataList.getDataByKey("mainAcvtDongNm", cityName);
-                        if (selectedData != null) {
+                        if (existy(selectedData)) {
                             cityCd = selectedData.mainAcvtAdmDongCd;
                         }
                     }
@@ -987,7 +985,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                     getSexAgePieChart('chart1', 'chart2', data.sexBarList, data.ageBarList);
                     getSexAgeBarChart('chart3', data.sexAgeBarList);
                     getRankTable(data.rankTableList);
-                    getNetworkChart("chart4", data.arPocNetworkNodeList, data.arPocNetworkLinkList);
+                    getNetworkChart("chartNetworkMain", data.arPocNetworkNodeList, data.arPocNetworkLinkList);
 
                 }
 
@@ -1009,7 +1007,7 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                         } else {
                             contentTxt += '      <tr> ';
                             if (list[i].mainAcvtAdmDongCd.length > 5) {
-                                contentTxt += '        <td class="txtC"><a href="#" onclick="openDongView(\'' + list[i].mainAcvtDongNm + '\', \'' + list[i].mainAcvtAdmDongCd + '\'); return false;" data-target="#myModal3" data-toggle="modal" id="inputTest_' + list[i].mainAcvtAdmDongCd + '">' + list[i].mainAcvtDongNm + '<span class="floatR"><i class="fa fa-chevron-right"></i></span></a></td> ';
+                                contentTxt += '        <td class="txtC"><a href="#" onclick="openDongView(\'' + list[i].mainAcvtDongNm + '\', \'' + list[i].mainAcvtAdmDongCd + '\'); return false;" data-target="#networkDongChartModal" data-toggle="modal" id="inputTest_' + list[i].mainAcvtAdmDongCd + '">' + list[i].mainAcvtDongNm + '<span class="floatR"><i class="fa fa-chevron-right"></i></span></a></td> ';
                             } else {
                                 contentTxt += '        <td class="txtC">' + list[i].mainAcvtDongNm + '</td> ';
                             }
@@ -1040,6 +1038,9 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 $("#rankGrid").empty();
                 $("#rankGrid").append(contentTxt);
             }
+
+
+
             /**
              * ##############  지역별 모수 현황 차트 START  ##############
              */
@@ -1235,10 +1236,11 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 });
                 return [chartData, categoryData];
             }
-
             /**
              * ##############  지역별 모수 현황 차트 END  ##############
              */
+
+
 
             /**
              * ##############  성별/연령대별 차트 START  ##############
@@ -1373,10 +1375,11 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
              * ##############  성별/연령대별 차트 END  ##############
              */
 
+
+
             /**
              * ##############  성연령대별 차트 START  ##############
              */
-            //
             function getSexAgeBarChart(chartId, dataList) {
                 var myChart = echarts.init(document.getElementById(chartId));
                 myChart.setTheme(GV_CHART_THEME);
@@ -1516,10 +1519,10 @@ SK Planet 고객은 어디에서 활동을 많이 하고, 함께 방문하는 �
                 }];
                 return [max, chartData];
             }
-
             /**
              * ##############  성연령대별 차트 END  ##############
              */
+
         </script>
     </tiles:putAttribute>
 </tiles:insertDefinition>
